@@ -1,0 +1,192 @@
+#checking the data as given in the excel sheet
+initial_data <- Typical_Employee_Survey_Data
+summary(initial_data)
+
+#analyzing the initial observations to identify data trends
+pairs(initial_data, main = "Initial data all variables comparision pairs plot")
+
+#data has been converted based on the inputs given in the questions
+srvdata <- Emp_Survey_Sheet1
+summary(srvdata)
+
+#Job Satisfaction v/s Longevity (included Gender variation)
+srvdata1 <- srvdata
+#manually rearranging the order of X axis
+srvdata1$Job_Stf <- factor(srvdata1$Job_Stf,levels = c("Very Dissatisfied","A Little Dissatisfied","Moderately Satisfied","Very Satisfied"))
+srvdata1 %>%
+  ggplot(aes(x = Job_Stf, y = Longevity, color = Gender))+
+  geom_point(aes(shape = Gender),size = 2)+
+  ggtitle("Longevity v/s Job Satisfaction")+
+  xlab("Job Satisfaction Survey Results")+
+  ylab("Longevity of Employees")
+#The plot shows that the Gender difference is scattered all over the visual and doesn't show any significant difference by plotting them separately which aligns with the same inference that we saw earlier with the pairs() plots inference
+
+srvdata1$Job_Stf <- factor(srvdata1$Job_Stf,levels = c("Very Dissatisfied","A Little Dissatisfied","Moderately Satisfied","Very Satisfied"))
+srvdata1 %>%
+  ggplot(aes(x = Job_Stf, y = Longevity))+
+  geom_point(size = 2)+
+  ggtitle("Longevity v/s Job Satisfaction")+
+  xlab("Job Satisfaction Survey Results")+
+  ylab("Longevity of Employees")+
+  annotate("rect",xmin=c("Very Dissatisfied"),xmax=c("A Little Dissatisfied"),ymin=c(0),ymax=c(10),alpha=0.2,color="red",fill="red")
+#It can also be observed on the bottom left of the plot that the almost all employees who marked that they are Dissatisfied have a longevity of 10 or less years, which implies that the company need to have extra focus on the employees who come under this category and try to cater to their needs
+
+srvdata2 <- srvdata
+srvdata2$Imp_Job_Char <- factor(srvdata2$Imp_Job_Char)
+srvdata2 %>%
+  ggplot(aes(x = Imp_Job_Char, y = Longevity))+
+  geom_point(size = 2)+
+  ggtitle("Longevity v/s Important Job Characteristic")+
+  xlab("Important Job Characteristic Survey Results")+
+  ylab("Longevity of Employees")
+#It can be inferred that for longevity below 10, the survey results are scattered
+
+srvdata2 <- srvdata
+srvdata2$Imp_Job_Char <- factor(srvdata2$Imp_Job_Char)
+srvdata2 %>%
+  ggplot(aes(x = Imp_Job_Char, y = Longevity))+
+  geom_point(size = 2)+
+  ggtitle("Longevity v/s Important Job Characteristic")+
+  xlab("Important Job Characteristic Survey Results")+
+  ylab("Longevity of Employees")+
+  annotate("rect",xmin=c("Enjoying the Work"),xmax=c("Opportunities for Advancement"),ymin=c(10),ymax=c(57),alpha=0.2,color="green",fill="green")
+#But, when we observe for longevity above 10 years, most of the employees preferred "Enjoying the Work" chracteristic over all others. Hence, the management needs to invest more on making the work more fun and enjoyable for the employees
+
+srvdata3 <- srvdata
+srvdata3$Promotion_Atb <- factor(srvdata3$Promotion_Atb,levels = c("Very Unlikely","Unlikely","Not Sure","Likely","Very Likely"))
+srvdata3 %>%
+  ggplot(aes(x = Promotion_Atb, y = Longevity,color = Job_Stf))+
+  geom_point(aes(shape=Job_Stf),size = 2)+
+  ggtitle("Longevity v/s Chance for Promotion")+
+  xlab("Chance of Promotion")+
+  ylab("Longevity of Employees")
+#It can be seen that the employees who felt they are Likey and Very Likely to get a promotion are the ones who marked as Moderately Satisfied and Very Satisfied with their Job
+
+srvdata3 <- srvdata
+srvdata3$Promotion_Atb <- factor(srvdata3$Promotion_Atb,levels = c("Very Unlikely","Unlikely","Not Sure","Likely","Very Likely"))
+srvdata3 %>%
+  ggplot(aes(x = Promotion_Atb, y = Longevity,color = Job_Stf))+
+  geom_point(aes(shape=Job_Stf),size = 2)+
+  ggtitle("Longevity v/s Chance for Promotion")+
+  xlab("Chance of Promotion")+
+  ylab("Longevity of Employees")+
+  annotate("rect",xmin=c("Not Sure"),xmax=c("Very Likely"),ymin=c(0),ymax=c(57),alpha=0.2,color="green",fill="green")
+
+srvdata3 <- srvdata
+srvdata3$Promotion_Atb <- factor(srvdata3$Promotion_Atb,levels = c("Very Unlikely","Unlikely","Not Sure","Likely","Very Likely"))
+srvdata3 %>%
+  ggplot(aes(x = Promotion_Atb, y = Age,color = Job_Stf))+
+  geom_point(aes(shape=Job_Stf),size = 2)+
+  ggtitle("Age v/s Chance for Promotion")+
+  xlab("Chance of Promotion")+
+  ylab("Age of Employees")
+#The plot is scattered all over and they is no significant inference that can be observed based on the Age of the employees
+#Regardless of the age, the longevity of the employees showed better results in terms of inference
+
+srvdata4 <- srvdata
+srvdata4$DecisionMaking_Atb <- factor(srvdata4$DecisionMaking_Atb,levels = c("Never","Sometimes","Much of the Time","Always"))
+srvdata4 %>%
+  ggplot(aes(x = DecisionMaking_Atb, y = Longevity))+
+  geom_point(size = 2)+
+  ggtitle("Longevity v/s Decision Making")+
+  xlab("Decision Making")+
+  ylab("Longevity of Employees")
+#There are very few employees who are never involved or always involved in decision making
+
+srvdata4 <- srvdata
+srvdata4$DecisionMaking_Atb <- factor(srvdata4$DecisionMaking_Atb,levels = c("Never","Sometimes","Much of the Time","Always"))
+srvdata4 %>%
+  ggplot(aes(x = DecisionMaking_Atb, y = Longevity))+
+  geom_point(size = 2)+
+  ggtitle("Longevity v/s Decision Making")+
+  xlab("Decision Making")+
+  ylab("Longevity of Employees")+
+  annotate("rect",xmin=c("Sometimes"),xmax=c("Much of the Time"),ymin=c(0),ymax=c(57),alpha=0.2,color="blue",fill="blue")
+#We cannot summarise this to the point as there are three different types of employees involved and they are not separated in the given data
+
+srvdata5 <- srvdata
+srvdata5$BudgetoryDec_Atb <- factor(srvdata5$BudgetoryDec_Atb,levels = c("Yes","No"))
+srvdata5 %>%
+  ggplot(aes(x = BudgetoryDec_Atb, y = Longevity))+
+  geom_point(size = 2)+
+  ggtitle("Longevity v/s Budgetary Decisions")+
+  xlab("Budgetary Decision")+
+  ylab("Longevity of Employees")
+#It can be seen that the Budgetary Decisions are scattered all over the longevity. Whereas, when we observe the data for employees with 30+ years of longevity they are definitely included in Budgetary decisions
+
+srvdata5 <- srvdata
+srvdata5$BudgetoryDec_Atb <- factor(srvdata5$BudgetoryDec_Atb,levels = c("Yes","No"))
+srvdata5 %>%
+  ggplot(aes(x = BudgetoryDec_Atb, y = Longevity))+
+  geom_point(size = 2)+
+  ggtitle("Longevity v/s Budgetary Decisions")+
+  xlab("Budgetary Decision")+
+  ylab("Longevity of Employees")+
+  annotate("rect",xmin=c("Yes"),xmax=c("No"),ymin=c(30),ymax=c(57),alpha=0.2,color="green",fill="green")
+#It is clear that with more years in the company, employees are given the chance to take monetory decisions. Still, it is not completely clear as the data doesn't reveal the job roles of the employees
+
+srvdata6 <- srvdata
+srvdata6$Proud_Atb<- factor(srvdata6$Proud_Atb,levels = c("Not At All Proud","Indifferent","Somewhat Proud","Very Proud"))
+srvdata6 %>%
+  ggplot(aes(x = Proud_Atb, y = Longevity,color = Job_Stf))+
+  geom_point(aes(shape=Job_Stf),size = 2)+
+  ggtitle("Longevity v/s How Proud are you?")+
+  xlab("Taking Pride in work")+
+  ylab("Longevity of Employees")
+#The data shows that the employees who are Very Proud of the company majorly consist of the the employees who marked that thery are Very Satisfied with their job
+
+srvdata6 <- srvdata
+srvdata6$Proud_Atb<- factor(srvdata6$Proud_Atb,levels = c("Not At All Proud","Indifferent","Somewhat Proud","Very Proud"))
+srvdata6 %>%
+  ggplot(aes(x = Proud_Atb, y = Longevity,color = Job_Stf))+
+  geom_point(aes(shape=Job_Stf),size = 2)+
+  ggtitle("Longevity v/s How Proud are you?")+
+  xlab("Taking Pride in work")+
+  ylab("Longevity of Employees")+
+  annotate("rect",xmin=c("Somewhat Proud"),xmax=c("Very Proud"),ymin=c(10),ymax=c(57),alpha=0.2,color="green",fill="green")
+#Except a few, almost all employees with more than 10 years of longevity feel proud working for the company which is a great thing for the company. Simultaneously, they need to work on the few employees who have marked that they are Indiferrent or Not at all Proud and understand the underlying issues
+
+srvdata7 <- srvdata
+srvdata7$AnotherJob_Atb<- factor(srvdata7$AnotherJob_Atb,levels = c("Very Unlikely","Unlikely","Not Sure","Likely","Very Likely"))
+srvdata7 %>%
+  ggplot(aes(x = AnotherJob_Atb, y = Longevity,color = Job_Stf))+
+  geom_point(aes(shape=Job_Stf),size = 2)+
+  ggtitle("Longevity v/s Not Switching Job")+
+  xlab("Staying at the Company")+
+  ylab("Longevity of Employees")
+#Employees who feel Very Satisfied and Moderately satisfied are Likely to turn down other offers which can be understood
+
+srvdata7 <- srvdata
+srvdata7$AnotherJob_Atb<- factor(srvdata7$AnotherJob_Atb,levels = c("Very Unlikely","Unlikely","Not Sure","Likely","Very Likely"))
+srvdata7 %>%
+  ggplot(aes(x = AnotherJob_Atb, y = Longevity,color = Job_Stf))+
+  geom_point(aes(shape=Job_Stf),size = 2)+
+  ggtitle("Longevity v/s Not Switching Job")+
+  xlab("Staying at the Company")+
+  ylab("Longevity of Employees")+
+  annotate("rect",xmin=c("Very Unlikely"),xmax=c("Unlikely"),ymin=c(10),ymax=c(50),alpha=0.2,color="red",fill="red")
+#A potential risk can be seen where employees who served for more than 10 years in the company and have marked that they are Satisfied with their job, are Unlikely or Very Unlikely to turn down a new job offer. This is a serious concern and the upper management must implement Employee Retention schemes to retain the loyal employees
+
+srvdata8 <- srvdata
+srvdata8$RelCoworkers_Atb <- factor(srvdata8$RelCoworkers_Atb,levels = c("Very Bad","Bad","So So","Good","Very Good"))
+srvdata8 %>%
+  ggplot(aes(x = RelCoworkers_Atb, y = Longevity))+
+  geom_point(size = 2)+
+  ggtitle("Longevity v/s Relation with Coworkers")+
+  xlab("Relation with Coworker")+
+  ylab("Longevity of Employees")
+#It is good to see that a lot of employees with less than 5 years of longevity also have a very good relations with their coworkers which is very healthy for the company
+
+srvdata8 <- srvdata
+srvdata8$RelCoworkers_Atb <- factor(srvdata8$RelCoworkers_Atb,levels = c("Very Bad","Bad","So So","Good","Very Good"))
+srvdata8 %>%
+  ggplot(aes(x = RelCoworkers_Atb, y = Longevity))+
+  geom_point(size = 2)+
+  ggtitle("Longevity v/s Relation with Coworkers")+
+  xlab("Relation with Coworker")+
+  ylab("Longevity of Employees")+
+  annotate("rect",xmin=c("Bad"),xmax=c("So So"),ymin=c(5),ymax=c(50),alpha=0.2,color="red",fill="red")
+#It can be seen that there are quite a few employees with more than 5 years of longevity and still do not have good relations with their coworker. This can bring down the productivity of employees
+#Management needs to focus on these employees and include activities to improve employee bonding
+
+#Thank you
