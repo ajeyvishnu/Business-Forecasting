@@ -1,0 +1,99 @@
+---
+title: "Homework 4"
+author: "aa2569@scarletmail.rutgers.edu"
+date: "10/02/2022"
+output: html_document
+---
+
+## Time Series plot & ACF
+
+```{r}
+library(fpp)
+
+plot(cafe,main = "Quarterly expenses for eating outside in Australia", xlab = "Time", ylab="Expenses for eating outside")
+Acf(cafe, main = "ACF plot - Cafe")
+```
+
+## Plotting Mean Forecast
+
+```{r}
+mean_forecast <- meanf(cafe,5)
+plot(mean_forecast, main = "Mean Forcast plot")
+```
+
+* The Mean Forcast plot takes the mean of the history of data and plots the mean as the future forecast.
+* It can be observed that the this forecast is not the right one to go with. We can observe an increasing trend in the data and the mean forecast doesn't provide the correct forecast.
+
+## Naive Plot
+
+```{r}
+naive_forecast <- naive(cafe,5)
+plot(naive_forecast, main = "Naive plot")
+```
+
+* The naive plot take the last/latest data point as the forecast for the coming period.
+* This is considered to be the basic forecast.
+* As we can see, it is much more meaningful than the mean forecast.
+* One drawback we can see for this data is that it is not considering the increasing trend.
+
+## Including all plots - Mean, Naive, Random Walk, Seasonal Naive, Moving Average
+
+```{r}
+rwf_forecast <- rwf(cafe,5, drift=TRUE)
+snaive_forecast <- snaive(cafe,5)
+MA5_forecast <- ma(cafe,order=5)
+MA9_forecast <- ma(cafe,order=9)
+plot(mean_forecast, main = "Plotting all forecasts")
+lines(naive_forecast$mean,col="red")
+lines(rwf_forecast$mean,col="green")
+lines(snaive_forecast$mean,col="black")
+lines(MA5_forecast,col="Pink")
+lines(MA9_forecast,col="Blue")
+```
+
+* The Random Walk function is used here with a drift. It has been shown in green colour in the plot. This is most considered for a trend variation in the data.
+* The Seasonal Naive (snaive) function is used for seasonal time series and is depicted in black colour forecast. It doesn't give the best forecast for this dataset as our data here doesn't have a seasonal variation.
+* The Moving Average functions consider the moving averages of the historic data. The number of the historic data is taken based on the order provided. The historic data is given equal weightages.
+* The moving average plots can be seen in Pink and Blue lines in the plot.
+
+## Attributes of the Naive Forecast
+
+```{r}
+attributes(naive_forecast)
+```
+
+# HoltWinters
+
+```{r}
+HW_forecast <- HoltWinters(cafe)
+plot(HW_forecast)
+SSE_Simple <- HoltWinters(cafe,beta=FALSE,gamma=FALSE)
+attributes(SSE_Simple)
+plot(SSE_Simple)
+SSE_Simple$SSE
+head(SSE_Simple$fitted)
+```
+
+* The Holtwinters gave a better estimate than SSE function here.
+* However, even the Holtwinters RSME values were quite high to be a good fit.
+
+## Decomposition
+
+```{r}
+ets_forecast <- ets(cafe)
+plot(ets_forecast)
+attributes(ets_forecast)
+ets_forecast$mse
+```
+
+## Forecast
+
+```{r}
+forecast_ets_1 <- forecast.ets(ets_forecast, h=5)
+plot(forecast_ets_1)
+```
+
+```{r}
+forecast_ets_2 <- forecast(ets_forecast, h=5)
+plot(forecast_ets_2)
+```
