@@ -1,0 +1,380 @@
+---
+title: "Midterm_BF"
+author: "aa2569@scarletmail.rutgers.edu"
+date: "2022-10-25"
+output: html_document
+---
+
+```{r}
+library(fpp)
+library(fpp2)
+library(TTR)
+library(ggplot2)
+library(readr)
+NJ_MedianListingPrice_AllHomes <- read_csv(file = 'NJ_MedianListingPrice_AllHomes.csv')
+NJ_Home_Raw <- NJ_MedianListingPrice_AllHomes$Value
+NJ_Home_TS <- ts(NJ_Home_Raw,frequency = 12, start = c(1996,4))
+```
+
+## Plot and Inference
+
+##### Q: Show a time series plot. 
+
+```{r}
+plot(NJ_Home_TS, main = 'Median home prices for House Listing in New Jersey', xlab = 'Year', ylab = 'Median home prices')
+```
+
+##### Q: Please summaries your observations of the times series plot
+
+* The plot shows that there is an increasing trend in the median home prices starting from 1996 till around 2006. 
+* From 2006 till 2012, there has been a decreasing trend in the home prices.
+* From 2012, there has been steady increasing trend till the year 2017.
+* The data however doesn't appear to show any seasonal variation.
+* If we were to forecast the data, we should be considering the window from 2012 to 2017.
+
+## Central Tendency
+
+##### Q: What are the min, max, mean, median, 1st and 3rd Quartile values of the times series? 
+
+```{r}
+summary(NJ_Home_TS)
+```
+
+* The summary function above gives the min, max, mean, median, 1st and 3rd Quartile values of the times series.
+
+##### Q: Show the box plot.
+```{r}
+boxplot(NJ_Home_TS, main = 'Boxplot for the Median House Prices Time Series')
+hist(NJ_Home_TS)
+```
+
+##### Q: Can you summarize your observation about the time series from the summary stats and box plot? 
+
+* The boxplot shows that there are no outliers in the data.
+* The Median is more towards the third quartile.
+* From summary, we can also see that the median value is greater than the mean for the time series.
+* This means that the data is left skewed. This can be justified seeing the histogram above as well.
+
+## Decomposition
+
+##### Plot the decomposition of the time series.
+
+```{r}
+stl_decomp <- stl(NJ_Home_TS,s.window ="periodic")
+plot(stl_decomp, main = 'Decomposition plot')
+```
+
+##### Is the times series seasonal?
+* No, the time series do not show any seasonal variation.
+
+##### Is the decomposition additive or multiplicative? 
+* The decomposition is multiplicative. 
+* Because, with time the trend seems to be also increasing in the data set.
+
+##### If seasonal, what are the values of the seasonal monthly indices? 
+##### For which month is the value of time series high and for which month is it low? 
+##### Can you think of the reason behind the value being high in those months and low in those months?
+* The data set doesn't have a seasonal variation. So the above three questions do not make sense for this time series. 
+* We can check this hypothesis in the coming question.
+
+##### Show the plot for time series adjusted for seasonality. Overlay this with the line for actual time series? Does seasonality have big fluctuations to the value of time series? 
+```{r}
+plot(NJ_Home_TS)
+lines(seasadj(stl_decomp), col="Red")
+```
+
+* As expected, the seasonal adjusted plot exactly overlapped with the actual data.
+* This states that our hypothesis is true and there appears to not have any seasonality in this time series
+
+## Naïve Method
+
+##### Output
+```{r}
+naive_forecast = naive(NJ_Home_TS)
+plot(naive_forecast)
+```
+
+##### Perform Residual Analysis for this technique. 
+###### Do a plot of residuals. What does the plot indicate?
+```{r}
+plot(naive_forecast$residuals)
+```
+
+* The residuals appear to have increasing positive values and then peaked in the year 2006 and then dipped and went on to be negative.
+* The residuals had a negative peak in the year 2008 and then slowly evened out from the year 2013.
+* We can test this hypothesis in the coming tests.
+
+###### Do a Histogram plot of residuals. What does the plot indicate?
+```{r}
+hist(naive_forecast$residuals)
+```
+* The histogram appears to be normally distributed.
+* But the values do not have a mean zero. The histogram appears to be skewed on one side.
+* This means that the data is biased as the mean is not zero.
+
+###### Do a plot of fitted values vs. residuals. What does the plot indicate? 
+
+###### Do a plot of actual values vs. residuals. What does the plot indicate?
+
+###### Do an ACF plot of the residuals? What does this plot indicate?
+
+```{r}
+Acf(naive_forecast$residuals)
+```
+
+* All the values of the Acf lot have crossed the confidence interval.
+* Meaning that naive forecast is missing some main variables which we have missed our consideration for the forecast.
+
+##### Print the 5 measures of accuracy for this forecasting technique
+
+```{r}
+accuracy(naive_forecast)
+```
+
+##### Forecast 
+###### Time series value for next year. Show table and plot
+
+```{r}
+forecast(naive_forecast)
+plot(forecast(naive_forecast))
+```
+
+##### Summarize this forecasting technique
+###### How good is the accuracy?
+* The ME, RMSE values are very high indicating that this method may not be the right one to go with.
+* We can consider more forecasting techniques and check if the error values are less than this one.
+
+###### What does it predict the value of time series will be in one year?
+* Based on naive forecast, the predicted value of the time series in one year is 311600.
+
+###### Other observation
+* From 2013 to 2017 there is observed to be an increasing trend in the data. So, naive forecast may not be a right way to forecast.
+* Rather, we can try naive method with drift component and that may yield us better forecast.
+
+
+## Simple Moving Averages
+
+##### Plot the graph for time series. 
+##### Show the Simple Moving average of order 3 on the plot above in Red
+##### Show the Simple Moving average of order 6 on the plot above in Blue
+##### Show the Simple Moving average of order 9 on the plot above in Green
+
+```{r}
+mavg3_forecast = ma(NJ_Home_TS,order=3)
+mavg6_forecast = ma(NJ_Home_TS,order=6)
+mavg9_forecast = ma(NJ_Home_TS,order=9) 
+plot(NJ_Home_TS, main = "Plot along with moving averages")
+lines(mavg3_forecast, col="Red")
+lines(mavg6_forecast, col="Blue")
+lines(mavg9_forecast, col="Green")
+```
+
+##### (Bonus) show the forecast of next 12 months using one of the simple average order that you feel works best for time series
+```{r}
+plot(forecast(mavg9_forecast), main = "Forecasting for next months using order 9")
+```
+
+##### What are your observations of the plot as the moving average order goes up? 
+* From the plots, it is observed that the higher the order we consider, the smoother the moviing average curve in the plot.
+* It can be seen that the Green line above is the smoothest compared to Blue or Red lines.
+
+## Simple Smoothing
+##### Perform a simple smoothing forecast for next 12 months for the time series. 
+###### What is the value of alpha?  What does that value signify? 
+###### What is the value of initial state? 
+###### What is the value of sigma?  What does the sigma signify?
+
+```{r}
+ses_data <- ses(NJ_Home_TS)
+plot(ses_data)
+attributes(ses_data)
+```
+
+##### Perform Residual Analysis for this technique. 
+###### Do a plot of residuals. What does the plot indicate?
+
+```{r}
+plot(ses_data$residuals)
+```
+
+* The residuals appear to have increasing positive values and then peaked in the year 2005 and then dipped and went on to be negative.
+* The residuals had a negative peak in the year between 2008 - 2009 and then slowly evened out from the year 2013.
+
+###### Do a Histogram plot of residuals. What does the plot indicate?
+
+```{r}
+hist(ses_data$residuals)
+```
+* The histogram appears to be normally distributed.
+* But the values do not have a mean zero. The histogram appears to be skewed on one side.
+* If the residual histogram doesnot have the mean to be zero, it means the data is biased.
+
+###### Do a plot of fitted values vs. residuals. What does the plot indicate? 
+###### Do a plot of actual values vs. residuals. What does the plot indicate?
+
+###### Do an ACF plot of the residuals? What does this plot indicate?
+
+```{r}
+Acf(ses_data$residuals)
+```
+
+* All the values of the Acf lot have crossed the confidence interval.
+* Meaning that simple smoothing forecast is missing some main variables which we have missed our consideration for the forecast.
+
+##### Print the 5 measures of accuracy for this forecasting technique
+
+```{r}
+accuracy(ses_data)
+```
+
+##### Forecast 
+###### Time series value for next year. Show table and plot
+
+```{r}
+forecast(ses_data)
+plot(forecast(ses_data))
+```
+
+##### Summarize this forecasting technique
+###### How good is the accuracy?
+* The ME, RMSE values are very high indicating that this method may not be the right one to go with.
+* We can consider more forecasting techniques and check if the error values are less than this one.
+
+###### What does it predict the value of time series will be in one year?
+* Based on simple smoothing forecast, the predicted value of the time series in one year is 311599.9.
+
+###### Other observation
+* From 2013 to 2017 there is observed to be an increasing trend in the data. So, this forecast may not be a right way to forecast.
+* We need to try other forecasting methods and check the accuracies in each case.
+
+## Holt-Winters 
+##### Perform Holt-Winters forecast for next 12 months for the time series.
+
+```{r}
+HW_forecast = HoltWinters(NJ_Home_TS)
+plot(forecast(HW_forecast))
+hw <- forecast(HW_forecast)
+```
+
+###### What is the value of alpha?  What does that value signify? 
+
+```{r}
+HW_forecast$alpha
+```
+
+* Alpha specifies the coefficient for the level smoothing in Holtwinters.
+* Values near 1.0 mean that the latest value has more weight.
+
+###### What is the value of beta? What does that value signify?
+
+```{r}
+HW_forecast$beta
+```
+
+* Beta specifies the coefficient for the trend smoothing in Holtwinters. 
+* Values 1.0 means that the latest value has highest weight
+
+###### What is the value of gamma? What does that value signify?
+
+```{r}
+HW_forecast$gamma
+```
+
+* Gamma specifies the coefficient for the seasonal smoothing in Holtwinters. 
+* Values 1.0 means that the latest value has highest weight.
+
+###### What is the value of initial states for the level, trend and seasonality? What do these values signify? 
+###### What is the value of sigma?  What does the sigma signify?
+
+##### Perform Residual Analysis for this technique. 
+###### Do a plot of residuals. What does the plot indicate?
+
+```{r}
+plot(hw$residuals)
+```
+
+* The residuals appear to be random and also the mean looks to be near zero. We can check this with histogram.
+* We can observe a couple of up and downs in 2009 and 2017. But even they did not show and growing residual pattern.
+
+###### Do a Histogram plot of residuals. What does the plot indicate?
+
+```{r}
+hist(hw$residuals)
+```
+* The histogram appears to be normally distributed.
+* And the mean is near zero. Indicating the data is not biased.
+* Overall, comparing the previous forecasts, this forecast appears to be the best till now. 
+
+###### Do a plot of fitted values vs. residuals. What does the plot indicate? 
+###### Do a plot of actual values vs. residuals. What does the plot indicate?
+
+###### Do an ACF plot of the residuals? What does this plot indicate?
+
+```{r}
+Acf(hw$residuals)
+```
+
+* Quite a few values of the Acf lot have crossed the confidence interval.
+* The Acf crossed the confidence interval at 1, 2, 3, 4, 12, 24 lags.
+* Which states that there are still few variables which we have missed in our forecast and that our forecast can still be improved.
+
+##### Print the 5 measures of accuracy for this forecasting technique
+
+```{r}
+accuracy(hw)
+```
+
+##### Forecast 
+###### Time series value for next year. Show table and plot
+
+```{r}
+forecast(HW_forecast)
+plot(forecast(HW_forecast))
+```
+
+##### Summarize this forecasting technique
+###### How good is the accuracy?
+* The ME, RMSE values are quite low compared to any of our previous forecasts.
+* Holwinters is a better forecast compared to naive and simple smoothing.
+
+###### What does it predict the value of time series will be in one year?
+* Based on HoltWinters forecast, the predicted value of the time series in one year is 331051.8.
+
+###### Other observation
+* Holtwinters appears to be the best forecast considering all the previous forecast methods.
+* However, this forecast can still be improved as we can see that the residuals have crossed the confidence interval in the Acf plot.
+
+## Accuracy Summary
+##### Show a table of all the forecast method above with their accuracy measures.
+
+```{r}
+accuracy(naive_forecast)
+accuracy(ses_data)
+accuracy(hw)
+```
+
+##### Show the best and worst forecast method for the accuracy measure of your choice. Why did you choose that accuracy measure?
+
+* To start with, there is nothing like best or worst forecast.
+* Considering the accuracy data above, HoltWinters forecast seems to fit the time series the best as it has the least error values.
+* And naive forecast seems to be the worst as it has the largest ME and RMSE values.
+
+## Conclusion
+##### Summarize your analysis of time series value over the time-period. 
+
+* Upon initial observation, the data looked to have only trend and did not appear to show any seasonal variation.
+* We have checked the hypothesis and have observed that there is no seasonal variation in the time series.
+* Based on the three forecasting methods naive, simple smoothing, and HoltWinters, we can see that HoltWinters forecast provides to be the better forecasting method in this case.
+* This is because the forecast fits perfectly and also the error values are quiet low for HoltWinters forecast.
+
+##### Based on your analysis and forecast above, do you think the value of the time series will increase, decrease or stay flat over the next year? How about next 2 years?
+
+* Based on the analysis and forecast, the time series will increase over the next year and the next 2 years.
+
+
+
+  
+ 
+  
+  
+  
